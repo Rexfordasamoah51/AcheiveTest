@@ -7,9 +7,9 @@ String assetsResponseModelToJson(AssetsResponseModel data) =>
     json.encode(data.toJson());
 
 class AssetsResponseModel {
-  AssetsResponseModel({this.data});
+  AssetsResponseModel({required this.data});
 
-  List<dynamic>? data;
+  List<dynamic> data = [];
   factory AssetsResponseModel.fromJson(Map<String, dynamic> json) =>
       AssetsResponseModel(
         data: json["data"],

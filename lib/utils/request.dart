@@ -55,14 +55,7 @@ class Request {
 
   /// read token
   Map<String, dynamic> getAuthorizationHeader() {
-    // ignore: prefer_typing_uninitialized_variables
     var headers = <String, dynamic>{};
-    // String? token = Global.profile?.token;
-    // if (token != null) {
-    //   headers = {
-    //     'Authorization': 'JWT $token',
-    //   };
-    // }
     return headers;
   }
 
