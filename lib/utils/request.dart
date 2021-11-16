@@ -55,7 +55,9 @@ class Request {
 
   /// read token
   Map<String, dynamic> getAuthorizationHeader() {
-    var headers = <String, dynamic>{};
+    var headers = <String, dynamic>{
+      'Content-Type': 'application/json',
+    };
     return headers;
   }
 
@@ -63,10 +65,6 @@ class Request {
   Future get(String path, {dynamic params, Options? options}) async {
     Options requestOptions = options ?? Options();
 
-    Map<String, dynamic> _authorization = getAuthorizationHeader();
-    if (_authorization.isNotEmpty) {
-      requestOptions = requestOptions.copyWith(headers: _authorization);
-    }
     var response = await dio.get(path,
         queryParameters: params,
         options: requestOptions,
@@ -165,7 +163,7 @@ class Request {
         }
       case DioErrorType.other:
         {
-          return ErrorEntity(code: -1, message: "Other error");
+          return ErrorEntity(code: -2, message: "Other error");
         }
       case DioErrorType.response:
         {

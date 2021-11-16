@@ -1,4 +1,3 @@
-import 'package:achievetest/common/colors/colors.dart';
 import 'package:achievetest/components/components.dart';
 import 'package:achievetest/components/custom_app_bar.dart';
 import 'package:achievetest/components/widget_wrapper.dart';
@@ -16,10 +15,7 @@ class HomePage extends GetView<HomeController> {
   Widget build(BuildContext context) {
     return AppWrapper(
       appBar: CustomAppBar(
-        title: Text(
-          'Achieve',
-          style: Theme.of(context).textTheme.headline6,
-        ),
+        title: const _AppBarTitle(),
         context: context,
         actions: const [
           _SearchBar(),
@@ -41,8 +37,36 @@ class _AssetsDisplay extends GetView<HomeController> {
       child: GetBuilder(
         init: HomeController(),
         builder: (_) {
-          return const _AssetsList();
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Expanded(child: _AssetsList()),
+              // when the _loadMore function is running
+
+              _Loader(controller: controller),
+            ],
+          );
         },
+      ),
+    );
+  }
+}
+
+class _Loader extends StatelessWidget {
+  const _Loader({
+    Key? key,
+    required this.controller,
+  }) : super(key: key);
+
+  final HomeController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: controller.isLoading ? 50.0 : 0,
+      color: Colors.transparent,
+      child: const Center(
+        child: CircularProgressIndicator(),
       ),
     );
   }
@@ -55,51 +79,67 @@ class _AssetsList extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: controller.assetsModel.data.length,
-      physics: const BouncingScrollPhysics(),
-      itemBuilder: (_, index) {
-        var name = '${controller.assetsModel.data[index]['name']}';
-        var price = truncate(
-          MoneyFormat.moneyFormat(
-              '${controller.assetsModel.data[index]['priceUsd']}'),
-          9,
-        );
-        var market = truncate(
-          MoneyFormat.moneyFormat(
-              '${controller.assetsModel.data[index]['marketCapUsd']}'),
-          9,
-        );
-        return controller.assetsModel.data.isEmpty
-            ? const _Loader()
-            : ListTile(
-                title: Text(
-                  name,
-                ),
-                subtitle: Text(
-                  'Prices: $price',
-                ),
-                trailing: Text(
-                  'Market Cap $market',
-                ),
-              );
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        if (notification is ScrollEndNotification) {
+          if (notification.metrics.pixels ==
+              notification.metrics.maxScrollExtent) {
+            _loadMore();
+          }
+        }
+        return true;
       },
+      child: const _AssetsBuilder(),
     );
+  }
+
+  /// load more data
+  void _loadMore() {
+    if (controller.assetsModel.data.isNotEmpty &&
+        controller.isLoading == false) {
+      controller.fetchAssets(
+        controller.assetsModel.data.length + controller.limit,
+      );
+      controller.update();
+    }
   }
 }
 
-class _Loader extends StatelessWidget {
-  const _Loader({
+class _AssetsBuilder extends GetView<HomeController> {
+  const _AssetsBuilder({
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      height: MediaQuery.of(context).size.height / 4,
-      width: MediaQuery.of(context).size.width / 2,
-      child: const CircularProgressIndicator(),
+    return GetBuilder(
+      init: HomeController(),
+      builder: (_) {
+        return ListView.builder(
+          itemCount: controller.assetsModel.data.length,
+          physics: const BouncingScrollPhysics(),
+          itemBuilder: (_, index) {
+            var name = '${controller.assetsModel.data[index]['name']}';
+            var price = truncate(
+              MoneyFormat.moneyFormat(
+                '${controller.assetsModel.data[index]['priceUsd']}',
+              ),
+              9,
+            );
+            var market = truncate(
+              MoneyFormat.moneyFormat(
+                '${controller.assetsModel.data[index]['marketCapUsd']}',
+              ),
+              9,
+            );
+            return ListTile(
+              title: Text(name),
+              subtitle: Text('Prices: $price'),
+              trailing: Text('Market Cap $market'),
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -113,11 +153,26 @@ class _SearchBar extends GetView<HomeController> {
       icon: const Icon(Icons.search),
       onPressed: () {
         showSearch(
-            context: context,
-            delegate: SearchData(
-              data: controller.assetsModel.data,
-            ));
+          context: context,
+          delegate: SearchData(
+            data: controller.assetsModel.data,
+          ),
+        );
       },
+    );
+  }
+}
+
+class _AppBarTitle extends StatelessWidget {
+  const _AppBarTitle({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      'Achieve',
+      style: Theme.of(context).textTheme.headline6,
     );
   }
 }
