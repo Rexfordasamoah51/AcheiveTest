@@ -1,6 +1,12 @@
-# achievetest
+# Achievetest
 
 A new Flutter project.
+
+## Feature Screenshot
+
+<p float="left">
+  <img src="media/flutter_01.png" width="150" />
+</p>
 
 ## Getting Started
 
