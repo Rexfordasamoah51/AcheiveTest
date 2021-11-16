@@ -1,6 +1,8 @@
+import 'package:achievetest/common/colors/colors.dart';
 import 'package:achievetest/components/components.dart';
 import 'package:achievetest/components/custom_app_bar.dart';
 import 'package:achievetest/components/widget_wrapper.dart';
+import 'package:achievetest/services/services.dart';
 import 'package:flutter/material.dart';
 
 import 'package:achievetest/pages/home/home_controller.dart';
@@ -39,19 +41,49 @@ class _AssetsDisplay extends GetView<HomeController> {
       child: GetBuilder(
         init: HomeController(),
         builder: (_) {
-          return ListView.builder(
-            itemCount: controller.assetsModel.data.length,
-            itemBuilder: (_, index) => Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: controller.assetsModel.data.isEmpty
-                  ? const _Loader()
-                  : Text(
-                      ' ${controller.assetsModel.data[index]['name']}',
-                    ),
-            ),
-          );
+          return const _AssetsList();
         },
       ),
+    );
+  }
+}
+
+class _AssetsList extends GetView<HomeController> {
+  const _AssetsList({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: controller.assetsModel.data.length,
+      physics: const BouncingScrollPhysics(),
+      itemBuilder: (_, index) {
+        var name = '${controller.assetsModel.data[index]['name']}';
+        var price = truncate(
+          MoneyFormat.moneyFormat(
+              '${controller.assetsModel.data[index]['priceUsd']}'),
+          9,
+        );
+        var market = truncate(
+          MoneyFormat.moneyFormat(
+              '${controller.assetsModel.data[index]['marketCapUsd']}'),
+          9,
+        );
+        return controller.assetsModel.data.isEmpty
+            ? const _Loader()
+            : ListTile(
+                title: Text(
+                  name,
+                ),
+                subtitle: Text(
+                  'Prices: $price',
+                ),
+                trailing: Text(
+                  'Market Cap $market',
+                ),
+              );
+      },
     );
   }
 }
