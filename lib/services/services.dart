@@ -1,3 +1,3 @@
 library services;
 
-export 'user.dart';
+export 'assets.dart';

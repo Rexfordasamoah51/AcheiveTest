@@ -56,7 +56,7 @@ class Request {
   /// read token
   Map<String, dynamic> getAuthorizationHeader() {
     // ignore: prefer_typing_uninitialized_variables
-    var headers;
+    var headers = <String, dynamic>{};
     // String? token = Global.profile?.token;
     // if (token != null) {
     //   headers = {
@@ -169,6 +169,10 @@ class Request {
       case DioErrorType.receiveTimeout:
         {
           return ErrorEntity(code: -1, message: "Response timeout");
+        }
+      case DioErrorType.other:
+        {
+          return ErrorEntity(code: -1, message: "Other error");
         }
       case DioErrorType.response:
         {

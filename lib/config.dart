@@ -1,7 +1,7 @@
 import 'package:achievetest/env.dart';
 
 // Development environment
-const SERVER_HOST_DEV = 'api.coincap.io/v2/assets';
+const SERVER_HOST_DEV = 'http://api.coincap.io/v2';
 
 // Production Environment
 const SERVER_HOST_PROD = '';

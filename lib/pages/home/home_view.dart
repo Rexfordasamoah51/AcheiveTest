@@ -29,8 +29,21 @@ class HomePage extends GetView<HomeController> {
           ),
         ],
       ),
-      child: const SizedBox(
-        child: Text('Testing'),
+      child: SizedBox(
+        child: GetBuilder(
+          init: HomeController(),
+          builder: (_) {
+            return ListView.builder(
+              itemCount: controller.assetsModel.data.length,
+              itemBuilder: (_, index) => Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  ' ${controller.assetsModel.data[index]['name']}',
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
